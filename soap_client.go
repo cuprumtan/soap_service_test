@@ -1,14 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"encoding/xml"
 	"fmt"
-	"log"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -46,6 +48,20 @@ func main() {
 	
 	var c Config
 	c.getConf()
+	
+	fmt.Println("\nGoogle Translate console service\n")
+	
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Source text: ")
+	text, _ := reader.ReadString('\n')
+	text = text[:len(text)-2]
+	fmt.Print("Source language: ")
+	sourceLanguage, _ := reader.ReadString('\n')
+	sourceLanguage = sourceLanguage[:len(sourceLanguage)-2]
+	fmt.Print("Destination language: ")
+	destinationLanguage, _ := reader.ReadString('\n')
+	destinationLanguage = destinationLanguage[:len(destinationLanguage)-2]
+	fmt.Print("\n")
 		
 	// wsdl service url
 	url := fmt.Sprintf("%s%s%s%s%s",
@@ -62,11 +78,11 @@ func main() {
 		   <soapenv:Body>
 		      <tran:GoogleTranslate>
 		         <!--Optional:-->
-		         <tran:source_text>what</tran:source_text>
+		         <tran:source_text>` + text + `</tran:source_text>
 		         <!--Optional:-->
-		         <tran:source_language>en</tran:source_language>
+		         <tran:source_language>` + sourceLanguage + `</tran:source_language>
 		         <!--Optional:-->
-		         <tran:destination_language>ru</tran:destination_language>
+		         <tran:destination_language>` + destinationLanguage + `</tran:destination_language>
 		      </tran:GoogleTranslate>
 		   </soapenv:Body>
 		</soapenv:Envelope>`,
