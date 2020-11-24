@@ -2,8 +2,14 @@ from googletrans import Translator
 from spyne import Application, rpc, ServiceBase, Unicode
 from lxml import etree
 from spyne.protocol.soap import Soap11
-from spyne.protocol.json import JsonDocument
 from spyne.server.wsgi import WsgiApplication
+import yaml
+
+
+def load_config():
+    with open('config.yml') as file:
+        config = yaml.load(file, Loader=yaml.FullLoader)
+    return config
 
 
 class SOAP(ServiceBase):
@@ -28,6 +34,7 @@ app = Application([SOAP], tns='Translator',
                   out_protocol=Soap11())
 application = WsgiApplication(app)
 if __name__ == '__main__':
+    config = load_config()
     from wsgiref.simple_server import make_server
-    server = make_server('0.0.0.0', 8000, application)
+    server = make_server(config['soap_host'], int(config['soap_port']), application)
     server.serve_forever()
