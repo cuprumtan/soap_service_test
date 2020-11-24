@@ -6,9 +6,16 @@ import (
 	"encoding/xml"
 	"fmt"
 	"log"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
+
+type Config struct {
+	Host string `yaml:"soap_host"`
+	Port string `yaml:"soap_port"`
+}
 
 type GoogleTranslate struct {
 	XMLName xml.Name
@@ -21,10 +28,32 @@ type GoogleTranslate struct {
 	}
 }
 
+func (c *Config ) getConf() *Config  {
+
+	yamlFile, err := ioutil.ReadFile("config.yml")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+
+	return c
+}
+
 func main() {
+	
+	var c Config
+	c.getConf()
+		
 	// wsdl service url
-	url := fmt.Sprintf("%s",
-		"http://127.0.0.1:8000/?wsdl",
+	url := fmt.Sprintf("%s%s%s%s%s",
+		"http://",
+		c.Host,
+		":",
+		c.Port,
+		"/?wsdl",
 	)
 	
 	// payload
